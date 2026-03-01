@@ -33,9 +33,9 @@ init_db()
 # -------------------------
 
 def generate_vehicle_data():
-    engine_temp = random.randint(180, 220)
-    battery = random.randint(60, 100)
-    tire_psi = random.randint(28, 36)
+     engine_temp = random.randint(200, 230)
+    battery = random.randint(50, 100)
+    tire_psi = random.randint(25, 36)
 
     alert_message = None
     priority = None
