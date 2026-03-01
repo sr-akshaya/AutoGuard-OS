@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Alert System | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+async function fetchVehicleData() {
+    const response = await fetch('/data');
+    const data = await response.json();
+
+    document.querySelector(".engine-temp").innerText = data.engine_temp + "°F";
+    document.querySelector(".battery-value").innerText = data.battery + "%";
+    document.querySelector(".battery-bar").style.width = data.battery + "%";
+    document.querySelector(".tire-value").innerText = data.tire_psi;
+}
+
+async function fetchAlerts() {
+    const response = await fetch('/alerts');
+    const alerts = await response.json();
+
+    let alertTable = document.querySelector(".alert-body");
+    alertTable.innerHTML = "";
+
+    alerts.forEach(alert => {
+        alertTable.innerHTML += `
+            <tr class="border-b border-slate-700">
+                <td class="px-6 py-4">${alert[0]}</td>
+                <td class="px-6 py-4">${alert[1]}</td>
+                <td class="px-6 py-4 text-slate-400">${alert[2]}</td>
+            </tr>
+        `;
+    });
+}
+
+setInterval(() => {
+    fetchVehicleData();
+    fetchAlerts();
+}, 5000);
+</script>
+    <style>
+        .alert-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans">
+
+    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="car" class="text-blue-500"></i>
+                <span class="text-xl font-bold tracking-tight">AutoGuard <span class="text-blue-500">OS</span></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="flex items-center gap-2 text-sm text-green-400">
+                    <span class="h-2 w-2 bg-green-400 rounded-full"></span> System Online
+                </span>
+                <button class="p-2 hover:bg-slate-800 rounded-full transition-colors">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold">Vehicle: Tesla Model 3</h1>
+            <p class="text-slate-400">Last updated: Just now</p>
+        </header>
+
+        <section class="mb-8">
+            <div class="bg-red-500/10 border border-red-500/50 rounded-xl p-4 flex items-start gap-4 alert-pulse">
+                <i data-lucide="alert-triangle" class="text-red-500 mt-1"></i>
+                <div>
+                    <h2 class="font-bold text-red-500">CRITICAL ALERT</h2>
+                    <p class="text-sm text-red-200">Unauthorized entry detected in Rear Trunk. GPS Tracking activated.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-blue-500/10 rounded-lg text-blue-500">
+                        <i data-lucide="thermometer"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 uppercase">Engine Temp</span>
+                </div>
+                <div class="text-2xl font-bold engine-temp">--</div>
+                <div class="text-xs text-green-400 mt-1 font-medium">Normal Range</div>
+            </div>
+
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-yellow-500/10 rounded-lg text-yellow-500">
+                        <i data-lucide="battery-charging"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 uppercase">Battery</span>
+                </div>
+                <div class="text-2xl font-bold battery-value">--</div>
+                <div class="bg-yellow-500 h-1.5 rounded-full battery-bar"></div>
+                    <div class="bg-yellow-500 h-1.5 rounded-full" style="width: 82%"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-purple-500/10 rounded-lg text-purple-500">
+                        <i data-lucide="gauge"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 uppercase">Tire PSI</span>
+                </div>
+                <div class="text-2xl font-bold tire-value">--</div>
+                <div class="text-xs text-slate-400 mt-1 italic">Optimal 32-35 PSI</div>
+            </div>
+
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-green-500/10 rounded-lg text-green-500">
+                        <i data-lucide="map-pin"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 uppercase">Security</span>
+                </div>
+                <div class="text-lg font-bold">Locked</div>
+                <div class="text-xs text-slate-400 mt-1 font-medium underline cursor-pointer hover:text-blue-400">View Map</div>
+            </div>
+        </div>
+
+        <section class="mt-12">
+            <h3 class="text-xl font-semibold mb-4">Activity Logs</h3>
+            <div class="bg-slate-800/30 rounded-2xl border border-slate-700 overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-800/50 text-slate-400">
+                        <tr>
+                            <th class="px-6 py-4">Event</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="alert-body divide-y divide-slate-700">
+                        <tr>
+                            <td class="px-6 py-4 flex items-center gap-2"><i data-lucide="key" class="w-4 h-4"></i> Door Unlocked</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-green-500/10 text-green-500 rounded text-xs">Auth User</span></td>
+                            <td class="px-6 py-4 text-slate-400">10:42 AM</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 flex items-center gap-2"><i data-lucide="shield-alert" class="w-4 h-4"></i> Impact Detection</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded text-xs">Low Warning</span></td>
+                            <td class="px-6 py-4 text-slate-400">Yesterday</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>
